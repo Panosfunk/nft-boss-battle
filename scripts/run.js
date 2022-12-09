@@ -18,7 +18,7 @@ const main = async () => {
   let txn;
   // We only have three characters.
   // an NFT w/ the character at index 2 of our array.
-  txn = await gameContract.mintCharacterNFT(2);
+  txn = await gameContract.mintCharacterNFT(0);
   await txn.wait();
   
   // Get the value of the NFT's URI.
@@ -29,6 +29,9 @@ const main = async () => {
   await txn.wait();
   
   txn = await gameContract.attackBoss();
+  await txn.wait();
+
+  txn = await gameContract.reviveCharacterNFT();
   await txn.wait();
 };
 

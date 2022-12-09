@@ -43,6 +43,7 @@ contract MyEpicGame is ERC721 {
 
   event CharacterNFTMinted(address sender, uint256 tokenId, uint256 characterIndex);
   event AttackComplete(address sender, uint256 newBossHp, uint256 newPlayerHp);
+  event RevivalComplete(address sender, uint256 newResetHp);
   
   constructor(
     string[] memory characterNames,
@@ -148,7 +149,7 @@ contract MyEpicGame is ERC721 {
       bigBoss.hp = 0;
       console.log("The boss is dead!");
     } else {
-      if (randomInt(10) > 5) {                                 // by passing 10 as the mod, we elect to only grab the last digit (0-9) of the hash!
+      if (randomInt(10) > 0) {                                 // by passing 10 as the mod, we elect to only grab the last digit (0-9) of the hash!
           bigBoss.hp = bigBoss.hp - player.ad;
           console.log("%s attacked boss. New boss hp: %s", player.name, bigBoss.hp);
       } else {
@@ -160,7 +161,7 @@ contract MyEpicGame is ERC721 {
       player.hp = 0;
       console.log("Rip in peace player. You will not be remembered");
     } else {
-      if (randomInt(10) > 5) {
+      if (randomInt(10) > 0) {
         player.hp = player.hp - bigBoss.ad;
         console.log("%s attacked you! Your new hp is: %s", bigBoss.name, player.hp);
       } else {
@@ -168,6 +169,20 @@ contract MyEpicGame is ERC721 {
       }
     }
     emit AttackComplete(msg.sender, bigBoss.hp, player.hp);
+  }
+
+  function reviveCharacterNFT() public {
+    uint256 nftTokenIdOfPlayer = nftHolders[msg.sender];
+    CharacterAttributes storage player = nftHolderAttributes[nftTokenIdOfPlayer];
+
+    console.log("\nAttempting to revive character %s ", player.name);
+    require(player.hp == 0, "Bro you can't revive your character if its not dead.");
+
+    player.hp = player.maxHp;
+    console.log("Players hp is set back to %s", player.hp);
+
+    emit RevivalComplete(msg.sender, player.maxHp);
+
   }
 
   function randomInt(uint _modulus) internal returns(uint) {
